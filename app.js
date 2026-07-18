@@ -1869,7 +1869,7 @@ window.moveBuilderStep = function(delta) {
   document.getElementById('btn-builder-next').innerHTML = activeBuilderStep === 5 ? '<i class="fa-solid fa-cart-plus"></i> Add To Bag' : 'Next Step';
 };
 
-window.selectCakeOption = function(optionType, value, price, text) {
+window.selectCakeOption = function(event, optionType, value , price, text) {
   state.cakeCustomizer[optionType] = value;
   state.cakeCustomizer[optionType + 'Price'] = price;
   state.cakeCustomizer[optionType + 'Text'] = text;
