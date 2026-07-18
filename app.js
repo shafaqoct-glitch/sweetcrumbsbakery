@@ -545,7 +545,7 @@ function renderProductCardHTML(prod) {
         <h3 class="product-title">${prod.name}</h3>
         <p class="product-desc">${prod.description}</p>
         <div class="product-footer">
-          <span class="product-price">$${prod.price.toFixed(2)}</span>
+          <span class="product-price"> Rs ${prod.price.toFixed(2)}</span>
           <button class="btn btn-primary" onclick="addToCart(${prod.id})" style="padding: 8px 16px; font-size: 0.85rem; border-radius: var(--radius-sm);" ${!prod.inStock ? 'disabled' : ''}>
             <i class="fa-solid fa-cart-plus"></i> Add
           </button>
@@ -997,7 +997,7 @@ window.openQuickView = function(productId) {
           <span style="color: var(--text-secondary); font-size: 0.85rem;">(${prod.reviewsCount} customer reviews)</span>
         </div>
 
-        <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">$${prod.price.toFixed(2)}</span>
+        <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">Rs ${prod.price.toFixed(2)}</span>
         
         <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">${prod.description}</p>
         
@@ -1006,7 +1006,7 @@ window.openQuickView = function(productId) {
           <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">Eggless Variant Option:</label>
           <div style="display: flex; gap: 10px;">
             <button class="btn btn-secondary active" id="quick-egg-no" onclick="toggleQuickEggless(false)" style="padding: 6px 14px; font-size: 0.8rem; border-color: var(--primary);">Standard (With Egg)</button>
-            <button class="btn btn-secondary" id="quick-egg-yes" onclick="toggleQuickEggless(true)" style="padding: 6px 14px; font-size: 0.8rem;">Eggless (+$2.00)</button>
+            <button class="btn btn-secondary" id="quick-egg-yes" onclick="toggleQuickEggless(true)" style="padding: 6px 14px; font-size: 0.8rem;">Eggless (+Rs 2500.00)</button>
           </div>
         </div>
 
@@ -1122,7 +1122,7 @@ function renderCartDrawer() {
           <h4>${item.name}</h4>
           ${item.customNotes ? `<p class="cart-item-desc">${item.customNotes}</p>` : ''}
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-            <span class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+            <span class="cart-item-price">Rs ${(item.price * item.quantity).toFixed(2)}</span>
             
             <div class="quantity-controls">
               <button class="qty-btn" onclick="updateCartItemQty(${index}, -1)">-</button>
@@ -1143,7 +1143,7 @@ function renderCartDrawer() {
     <div class="price-breakdown" style="border-top: none; padding-top: 0; margin-top: 0; margin-bottom: 20px;">
       <div class="price-row">
         <span>Subtotal</span>
-        <span style="font-weight: 600; color: var(--text-primary);">$${subtotal.toFixed(2)}</span>
+        <span style="font-weight: 600; color: var(--text-primary);">Rs ${subtotal.toFixed(2)}</span>
       </div>
       <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: right; margin-top: 4px;">Taxes and shipping calculated at checkout</p>
     </div>
@@ -1199,7 +1199,7 @@ function renderCart() {
         <div class="cart-item-info">
           <h3 style="font-size: 1.2rem; font-family: 'Poppins', sans-serif; font-weight: 600; margin-bottom: 6px;">${item.name}</h3>
           ${item.customNotes ? `<p class="cart-item-desc" style="font-size: 0.85rem; margin-bottom: 6px; font-style: italic; color: var(--text-secondary);"><i class="fa-solid fa-cake" style="color: var(--primary); margin-right: 4px;"></i>${item.customNotes}</p>` : ''}
-          <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-secondary);">$${item.price.toFixed(2)} each</span>
+          <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-secondary);">Rs ${item.price.toFixed(2)} each</span>
         </div>
         
         <div class="quantity-controls" style="margin: 0 30px;">
@@ -1209,7 +1209,7 @@ function renderCart() {
         </div>
         
         <div style="text-align: right; min-width: 100px;">
-          <span class="cart-item-price" style="font-size: 1.2rem;">$${(item.price * item.quantity).toFixed(2)}</span>
+          <span class="cart-item-price" style="font-size: 1.2rem;">Rs ${(item.price * item.quantity).toFixed(2)}</span>
           <button class="icon-btn" onclick="removeCartItem(${index})" style="color: var(--accent); margin-left: auto; margin-top: 8px;"><i class="fa-solid fa-trash-can"></i></button>
         </div>
       </div>
@@ -1260,26 +1260,26 @@ function renderCart() {
             <div class="price-breakdown">
               <div class="price-row">
                 <span>Subtotal</span>
-                <span>$${subtotal.toFixed(2)}</span>
+                <span>Rs ${subtotal.toFixed(2)}</span>
               </div>
               <div class="price-row">
                 <span>Sales Tax (8%)</span>
-                <span>$${tax.toFixed(2)}</span>
+                <span>Rs ${tax.toFixed(2)}</span>
               </div>
               <div class="price-row">
                 <span>Home Delivery</span>
-                <span>${delivery === 0 ? '<span style="color: var(--primary); font-weight: 600;">FREE</span>' : `$${delivery.toFixed(2)}`}</span>
+                <span>${delivery === 0 ? '<span style="color: var(--primary); font-weight: 600;">FREE</span>' : `Rs ${delivery.toFixed(2)}`}</span>
               </div>
               ${state.appliedCoupon ? `
                 <div class="price-row" style="color: var(--accent); font-weight: 600;">
                   <span>Discount (${state.appliedCoupon.code})</span>
-                  <span>-$${discount.toFixed(2)}</span>
+                  <span>-Rs ${discount.toFixed(2)}</span>
                 </div>
               ` : ''}
               
               <div class="price-row total">
                 <span>Total Amount</span>
-                <span>$${netTotal.toFixed(2)}</span>
+                <span>Rs ${netTotal.toFixed(2)}</span>
               </div>
             </div>
 
@@ -1340,7 +1340,7 @@ function renderCheckout() {
         <span style="color: var(--text-secondary); font-weight: 500;">
           ${item.name} <strong style="color: var(--text-primary);">x ${item.quantity}</strong>
         </span>
-        <span style="font-weight: 600; color: var(--text-primary);">$${(item.price * item.quantity).toFixed(2)}</span>
+        <span style="font-weight: 600; color: var(--text-primary);">Rs ${(item.price * item.quantity).toFixed(2)}</span>
       </div>
     `;
   });
@@ -1444,7 +1444,7 @@ function renderCheckout() {
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 16px;">
-              <i class="fa-solid fa-bag-shopping"></i> Confirm Order & Pay $${netTotal.toFixed(2)}
+              <i class="fa-solid fa-bag-shopping"></i> Confirm Order & Pay Rs ${netTotal.toFixed(2)}
             </button>
           </form>
         </div>
@@ -1461,15 +1461,15 @@ function renderCheckout() {
             <div class="price-breakdown" style="border-top: none; padding-top: 0; margin-top: 0;">
               <div class="price-row">
                 <span>Subtotal</span>
-                <span>$${subtotal.toFixed(2)}</span>
+                <span>Rs ${subtotal.toFixed(2)}</span>
               </div>
               <div class="price-row">
                 <span>Sales Tax (8%)</span>
-                <span>$${tax.toFixed(2)}</span>
+                <span>Rs ${tax.toFixed(2)}</span>
               </div>
               <div class="price-row">
                 <span>Home Delivery</span>
-                <span>${delivery === 0 ? 'FREE' : `$${delivery.toFixed(2)}`}</span>
+                <span>${delivery === 0 ? 'FREE' : `Rs ${delivery.toFixed(2)}`}</span>
               </div>
               ${state.appliedCoupon ? `
                 <div class="price-row" style="color: var(--accent); font-weight: 600;">
@@ -1480,7 +1480,7 @@ function renderCheckout() {
               
               <div class="price-row total">
                 <span>Total Amount</span>
-                <span>$${netTotal.toFixed(2)}</span>
+                <span>Rs ${netTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -1598,7 +1598,7 @@ window.handlePlaceOrder = function(event) {
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 600; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 8px;">
           <span>Total Charged:</span>
-          <span style="color: var(--primary); font-weight: 700;">$${netTotal.toFixed(2)}</span>
+          <span style="color: var(--primary); font-weight: 700;">Rs ${netTotal.toFixed(2)}</span>
         </div>
       </div>
       
@@ -1642,27 +1642,27 @@ function renderCustomCakes() {
           <div class="price-breakdown">
             <div class="price-row">
               <span>Sponge Base (<span id="preview-txt-flavor">Chocolate</span>)</span>
-              <span id="price-txt-flavor">$28.00</span>
+              <span id="price-txt-flavor">Rs 28.00</span>
             </div>
             <div class="price-row">
               <span>Size & Tiers (<span id="preview-txt-size">1 Tier - 1kg</span>)</span>
-              <span id="price-txt-size">+$0.00</span>
+              <span id="price-txt-size">+Rs 0.00</span>
             </div>
             <div class="price-row">
               <span>Frosting Styling (<span id="preview-txt-frosting">Buttercream</span>)</span>
-              <span>+$0.00</span>
+              <span>+Rs 0.00</span>
             </div>
             <div class="price-row">
               <span>Toppings Added</span>
-              <span id="price-txt-toppings">+$0.00</span>
+              <span id="price-txt-toppings">+Rs 0.00</span>
             </div>
             <div class="price-row">
               <span>Eggless Formulation Option</span>
-              <span id="price-txt-eggless">+$0.00</span>
+              <span id="price-txt-eggless">+Rs 0.00</span>
             </div>
             <div class="price-row total">
               <span>Estimated Cost</span>
-              <span id="price-txt-total">$28.00</span>
+              <span id="price-txt-total">Rs 28.00</span>
             </div>
           </div>
         </div>
@@ -1685,11 +1685,11 @@ function renderCustomCakes() {
             <div class="options-grid">
               <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'vanilla', 25.00, 'Vanilla Bean')">
 <div class="option-box selected" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
-                <span>Vanilla Sponge ($25)</span>
+                <span>Vanilla Sponge (Rs 25)</span>
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
                 <i class="fa-solid fa-cake" style="color: #6d4c41;"></i>
-                <span>Chocolate Fudge ($28)</span>
+                <span>Chocolate Fudge (Rs 28)</span>
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'red-velvet', 30.00, 'Red Velvet')">
                 <i class="fa-solid fa-cake" style="color: var(--accent);"></i>
@@ -1697,11 +1697,11 @@ function renderCustomCakes() {
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'pineapple', 26.00, 'Pineapple Paradise')">
                 <i class="fa-solid fa-cake" style="color: var(--highlight);"></i>
-                <span>Pineapple sponge ($26)</span>
+                <span>Pineapple sponge (Rs 26)</span>
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'black-forest', 29.00, 'Black Forest')">
                 <i class="fa-solid fa-cake" style="color: #3e2723;"></i>
-                <span>Black Forest ($29)</span>
+                <span>Black Forest (Rs 29)</span>
               </div>
             </div>
           </div>
@@ -1713,19 +1713,19 @@ function renderCustomCakes() {
             <div class="options-grid">
               <div class="option-box selected" onclick="selectCakeSize(event ,'1', '1kg', 0.00, 'Single Tier - 1kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1rem;"></i>
-                <span>1 Tier (1kg) (+$0)</span>
+                <span>1 Tier (1kg) (+Rs 0)</span>
               </div>
               <div class="option-box" onclick="selectCakeSize(event ,'1', '2kg', 15.00, 'Single Tier - 2kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1.4rem;"></i>
-                <span>1 Tier (2kg) (+$15)</span>
+                <span>1 Tier (2kg) (+Rs 15)</span>
               </div>
               <div class="option-box" onclick="selectCakeSize(event ,'2', '3kg', 35.00, 'Double Tier - 3kg')">
                 <i class="fa-solid fa-layer-group"></i>
-                <span>2 Tiers (3kg) (+$35)</span>
+                <span>2 Tiers (3kg) (+Rs 35)</span>
               </div>
               <div class="option-box" onclick="selectCakeSize(event ,'2', '5kg', 65.00, 'Double Tier - 5kg')">
                 <i class="fa-solid fa-layer-group" style="font-size: 1.8rem;"></i>
-                <span>2 Tiers (5kg) (+$65)</span>
+                <span>2 Tiers (5kg) (+Rs 65)</span>
               </div>
             </div>
           </div>
@@ -1741,7 +1741,7 @@ function renderCustomCakes() {
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'fondant', 5.00, 'Fondant Art')">
                 <i class="fa-solid fa-palette"></i>
-                <span>Smooth Fondant (+$5)</span>
+                <span>Smooth Fondant (+Rs 5)</span>
               </div>
               <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
                 <i class="fa-solid fa-cloud"></i>
@@ -1757,7 +1757,7 @@ function renderCustomCakes() {
             <div class="options-grid">
               <div class="option-box" id="toppingbox-berries" onclick="toggleCakeTopping('berries', 5.00)">
                 <i class="fa-solid fa-seedling" style="color: var(--accent);"></i>
-                <span>Fresh Berries (+$5)</span>
+                <span>Fresh Berries (+Rs 5)</span>
               </div>
               <div class="option-box" id="toppingbox-sprinkles" onclick="toggleCakeTopping('sprinkles', 2.00)">
                 <i class="fa-solid fa-ellipsis" style="color: var(--highlight);"></i>
@@ -1765,11 +1765,11 @@ function renderCustomCakes() {
               </div>
               <div class="option-box" id="toppingbox-shavings" onclick="toggleCakeTopping('shavings', 3.00)">
                 <i class="fa-solid fa-cookie-bite"></i>
-                <span>Chocolate Shavings (+$3)</span>
+                <span>Chocolate Shavings (+Rs 3)</span>
               </div>
               <div class="option-box" id="toppingbox-macarons" onclick="toggleCakeTopping('macarons', 8.00)">
                 <i class="fa-solid fa-cheese"></i>
-                <span>Parisian Macarons (+$8)</span>
+                <span>Parisian Macarons (+Rs 8)</span>
               </div>
             </div>
           </div>
@@ -1782,7 +1782,7 @@ function renderCustomCakes() {
             <div class="form-group" style="display: flex; gap: 10px; align-items: center; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
               <input type="checkbox" id="cake-eggless-toggle" onchange="toggleCakeEggless(this)" style="width: 20px; height: 20px; accent-color: var(--primary);">
               <div>
-                <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+$3.00)</label>
+                <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+RS 3.00)</label>
                 <span style="font-size: 0.75rem; color: var(--text-secondary);">Baked without eggs in dedicated allergen-free oven</span>
               </div>
             </div>
@@ -1968,23 +1968,23 @@ function updateCakeVisualizer() {
 
   // Update text values in summary columns
   document.getElementById('preview-txt-flavor').innerText = state.cakeCustomizer.flavorText;
-  document.getElementById('price-txt-flavor').innerText = `$${state.cakeCustomizer.flavorPrice.toFixed(2)}`;
+  document.getElementById('price-txt-flavor').innerText = `Rs ${state.cakeCustomizer.flavorPrice.toFixed(2)}`;
   
   document.getElementById('preview-txt-size').innerText = state.cakeCustomizer.sizeText;
-  document.getElementById('price-txt-size').innerText = `+$${state.cakeCustomizer.sizePrice.toFixed(2)}`;
+  document.getElementById('price-txt-size').innerText = `+Rs $${state.cakeCustomizer.sizePrice.toFixed(2)}`;
   
   document.getElementById('preview-txt-frosting').innerText = state.cakeCustomizer.frostingText;
   
   const toppingsCost = state.cakeCustomizer.toppings.reduce((sum, t) => sum + t.price, 0);
-  document.getElementById('price-txt-toppings').innerText = `+$${toppingsCost.toFixed(2)}`;
+  document.getElementById('price-txt-toppings').innerText = `+Rs ${toppingsCost.toFixed(2)}`;
   
   const egglessCost = state.cakeCustomizer.eggless ? 3.00 : 0.00;
-  document.getElementById('price-txt-eggless').innerText = `+$${egglessCost.toFixed(2)}`;
+  document.getElementById('price-txt-eggless').innerText = `+Rs ${egglessCost.toFixed(2)}`;
 
   // Calculate grand total cost
   const frostingCost = state.cakeCustomizer.frostingPrice || 0;
   const total = state.cakeCustomizer.flavorPrice + state.cakeCustomizer.sizePrice + frostingCost + toppingsCost + egglessCost;
-  document.getElementById('price-txt-total').innerText = `$${total.toFixed(2)}`;
+  document.getElementById('price-txt-total').innerText = `Rs ${total.toFixed(2)}`;
   state.cakeCustomizer.totalCost = total;
 }
 
@@ -2049,14 +2049,14 @@ function renderAccount() {
             </div>
             <div style="text-align: right;">
               <span class="status-pill status-${ord.status.toLowerCase()}">${ord.status}</span><br>
-              <strong style="color: var(--primary); font-size: 1.15rem; display: block; margin-top: 4px;">$${ord.total.toFixed(2)}</strong>
+              <strong style="color: var(--primary); font-size: 1.15rem; display: block; margin-top: 4px;">Rs ${ord.total.toFixed(2)}</strong>
             </div>
           </div>
           <div>
             ${ord.items.map(item => `
               <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 6px;">
                 <span>${item.name} <strong>x ${item.quantity}</strong></span>
-                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                <span>Rs ${(item.price * item.quantity).toFixed(2)}</span>
               </div>
             `).join('')}
           </div>
@@ -2260,7 +2260,7 @@ function renderAdmin() {
           <td><strong>${ord.id}</strong></td>
           <td>${ord.customer.name}</td>
           <td>${ord.date}</td>
-          <td>$${ord.total.toFixed(2)}</td>
+          <td>Rs ${ord.total.toFixed(2)}</td>
           <td>
             <select onchange="updateOrderStatus('${ord.id}', this.value)" style="border: 1px solid var(--border-color); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 0.8rem; background: #FFF;">
               <option value="Pending" ${ord.status === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -2285,7 +2285,7 @@ function renderAdmin() {
         <td><img src="${prod.image}" alt="${prod.name}" style="width: 40px; height: 40px; border-radius: var(--radius-sm); object-fit: cover;"></td>
         <td><strong>${prod.name}</strong></td>
         <td><span style="font-size: 0.8rem; text-transform: uppercase;">${prod.category.replace('-', ' ')}</span></td>
-        <td>$${prod.price.toFixed(2)}</td>
+        <td>Rs ${prod.price.toFixed(2)}</td>
         <td><i class="fa-solid fa-star" style="color: var(--highlight);"></i> ${prod.rating}</td>
         <td>
           <button class="btn btn-secondary" onclick="editProduct(${prod.id})" style="padding: 4px 8px; font-size: 0.75rem; color: var(--primary);"><i class="fa-solid fa-pen"></i></button>
@@ -2345,7 +2345,7 @@ function renderAdmin() {
               <div class="analytic-card">
                 <div class="analytic-info">
                   <h4>Total Revenue</h4>
-                  <span>$${totalRevenue.toFixed(2)}</span>
+                  <span>RS ${totalRevenue.toFixed(2)}</span>
                 </div>
                 <i class="fa-solid fa-dollar-sign" style="font-size: 2rem; color: var(--primary); opacity: 0.3;"></i>
               </div>
@@ -2359,7 +2359,7 @@ function renderAdmin() {
               <div class="analytic-card">
                 <div class="analytic-info">
                   <h4>Average Order</h4>
-                  <span>$${avgOrderValue.toFixed(2)}</span>
+                  <span>Rs ${avgOrderValue.toFixed(2)}</span>
                 </div>
                 <i class="fa-solid fa-calculator" style="font-size: 2rem; color: var(--primary); opacity: 0.3;"></i>
               </div>
@@ -2620,13 +2620,13 @@ window.viewOrderDetails = function(orderId) {
       ${ord.items.map(item => `
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span>${item.name} <strong>x ${item.quantity}</strong></span>
-          <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          <span>Rs ${(item.price * item.quantity).toFixed(2)}</span>
         </div>
         ${item.customNotes ? `<p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; padding-left: 10px; font-style: italic;">Note: ${item.customNotes}</p>` : ''}
       `).join('')}
 
       <div style="border-top: 1px dashed var(--border-color); padding-top: 10px; margin-top: 16px; text-align: right; font-weight: 700; color: var(--primary); font-size: 1.15rem;">
-        Grand Total: $${ord.total.toFixed(2)}
+        Grand Total: Rs ${ord.total.toFixed(2)}
       </div>
     </div>
   `;
