@@ -343,7 +343,7 @@ header {
 .hero {
   position: relative;
   min-height: calc(85vh - 80px);
-  background: linear-gradient(rgba(45, 45, 45, 0.3), rgba(45, 45, 45, 0.3)), url('assets/bakery_hero_bg.jpg') no-repeat center center/cover;
+ background: linear-gradient(rgba(45, 45, 45, 0.4), rgba(45, 45, 45, 0.4)), linear-gradient(135deg, #F3C77F, #F5B8C9);
   display: flex;
   align-items: center;
   justify-content: flex-start;
