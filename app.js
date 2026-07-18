@@ -396,7 +396,7 @@ function renderHome() {
           </button>
         </div>
         <div style="text-align: center; margin-top: 30px;">
-          <button class="btn btn-secondary" onclick="navigateTo('account', { tab: 'reviews' })">Write A Review</button>
+          <button class="btn btn-secondary" onclick="navigateTo('account', { tab: 'history' })">Write A Review</button>
         </div>
       </div>
     </section>
@@ -1617,7 +1617,8 @@ function renderCustomCakes() {
   const main = document.getElementById('main-content');
   activeBuilderStep = 1;
 
-  main.innerHTML = `
+  main.innerHTML =
+    updateCakeVisualizer();`
     <div class="container section-padding">
       <div class="text-center">
         <h1 class="section-title">Design Your Custom Cake</h1>
@@ -1682,8 +1683,8 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 1: Choose Sponge Base</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Select the delicious base recipe for your special custom cake.</p>
             <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeOption('flavor', 'vanilla', 25.00, 'Vanilla Bean')">
-                <i class="fa-solid fa-cake"></i>
+              <div class="option-box" onclick="selectCakeOption('flavor', 'vanilla', 25.00, 'Vanilla Bean')">
+<div class="option-box selected" onclick="selectCakeOption('flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
                 <span>Vanilla Sponge ($25)</span>
               </div>
               <div class="option-box" onclick="selectCakeOption('flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
