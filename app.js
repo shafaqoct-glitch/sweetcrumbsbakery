@@ -1683,23 +1683,23 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 1: Choose Sponge Base</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Select the delicious base recipe for your special custom cake.</p>
             <div class="options-grid">
-              <div class="option-box" onclick="selectCakeOption('flavor', 'vanilla', 25.00, 'Vanilla Bean')">
-<div class="option-box selected" onclick="selectCakeOption('flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
+              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'vanilla', 25.00, 'Vanilla Bean')">
+<div class="option-box selected" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
                 <span>Vanilla Sponge ($25)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
+              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
                 <i class="fa-solid fa-cake" style="color: #6d4c41;"></i>
                 <span>Chocolate Fudge ($28)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('flavor', 'red-velvet', 30.00, 'Red Velvet')">
+              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'red-velvet', 30.00, 'Red Velvet')">
                 <i class="fa-solid fa-cake" style="color: var(--accent);"></i>
                 <span>Red Velvet ($30)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('flavor', 'pineapple', 26.00, 'Pineapple Paradise')">
+              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'pineapple', 26.00, 'Pineapple Paradise')">
                 <i class="fa-solid fa-cake" style="color: var(--highlight);"></i>
                 <span>Pineapple sponge ($26)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('flavor', 'black-forest', 29.00, 'Black Forest')">
+              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'black-forest', 29.00, 'Black Forest')">
                 <i class="fa-solid fa-cake" style="color: #3e2723;"></i>
                 <span>Black Forest ($29)</span>
               </div>
@@ -1711,19 +1711,19 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 2: Dimensions & Tiers</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Configure cake levels and weight depending on your guest count.</p>
             <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeSize('1', '1kg', 0.00, 'Single Tier - 1kg')">
+              <div class="option-box selected" onclick="selectCakeSize(event ,'1', '1kg', 0.00, 'Single Tier - 1kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1rem;"></i>
                 <span>1 Tier (1kg) (+$0)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize('1', '2kg', 15.00, 'Single Tier - 2kg')">
+              <div class="option-box" onclick="selectCakeSize(event ,'1', '2kg', 15.00, 'Single Tier - 2kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1.4rem;"></i>
                 <span>1 Tier (2kg) (+$15)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize('2', '3kg', 35.00, 'Double Tier - 3kg')">
+              <div class="option-box" onclick="selectCakeSize(event ,'2', '3kg', 35.00, 'Double Tier - 3kg')">
                 <i class="fa-solid fa-layer-group"></i>
                 <span>2 Tiers (3kg) (+$35)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize('2', '5kg', 65.00, 'Double Tier - 5kg')">
+              <div class="option-box" onclick="selectCakeSize(event ,'2', '5kg', 65.00, 'Double Tier - 5kg')">
                 <i class="fa-solid fa-layer-group" style="font-size: 1.8rem;"></i>
                 <span>2 Tiers (5kg) (+$65)</span>
               </div>
@@ -1735,15 +1735,15 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 3: Frosting Styling</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Choose the icing finish type for the outer texture of your cake.</p>
             <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeOption('frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
+              <div class="option-box selected" onclick="selectCakeOption(event ,'frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
                 <i class="fa-solid fa-brush"></i>
                 <span>Cream Buttercream</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('frosting', 'fondant', 5.00, 'Fondant Art')">
+              <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'fondant', 5.00, 'Fondant Art')">
                 <i class="fa-solid fa-palette"></i>
                 <span>Smooth Fondant (+$5)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption('frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
+              <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
                 <i class="fa-solid fa-cloud"></i>
                 <span>Whipped Cream</span>
               </div>
