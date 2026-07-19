@@ -47,17 +47,31 @@ const state = {
 };
 
 // 2. Lifecycle & Init
-window.addEventListener('DOMContentLoaded', () => {
-  // If products are empty in localstorage, seed from mockData
-  if (state.products.length === 0 && window.bakeryProducts) {
-    state.products = [...window.bakeryProducts];
-    saveProductsToStorage();
-  }
-  
+window.addEventListener('DOMContentLoaded', async () => {
   // Setup view router
   initRouter();
   updateBadges();
-  
+
+  // Load products from the shared cloud database (Firestore) so every
+  // visitor, on every device, sees the exact same up-to-date catalog.
+  try {
+    let cloudProducts = await fetchProductsFromCloud();
+    if (cloudProducts.length === 0) {
+      // Very first run ever: seed the cloud database from the starter catalog
+      const seeded = await seedProductsIfEmpty();
+      cloudProducts = seeded || cloudProducts;
+    }
+    state.products = cloudProducts;
+  } catch (err) {
+    // If the cloud database can't be reached (e.g. no internet), fall back
+    // to whatever was last saved on this device so the site still works.
+    console.error('Could not reach cloud database, using local data:', err);
+    if (state.products.length === 0 && window.bakeryProducts) {
+      state.products = [...window.bakeryProducts];
+    }
+  }
+  saveProductsToStorage();
+
   // Check if URL parameters exist (simulated via hash routing if wanted, otherwise tab-based)
   navigateTo('home');
 });
@@ -1647,195 +1661,256 @@ function renderCustomCakes() {
   activeBuilderStep = 1;
 
   main.innerHTML = `
-    <div class="container section-padding">
-      <div class="text-center">
-        <h1 class="section-title">Design Your Custom Cake</h1>
-        <p class="section-subtitle">Choose your base, dimensions, frostings, toppings and write a custom message in real-time</p>
-      </div>
+    <div class="custom-cakes-page-bg">
+      <div class="container">
+        <div class="cake-builder-hero">
+          <div>
+            <h1 class="section-title" style="margin-bottom: 14px;">🎂 Create Your Dream Cake</h1>
+            <p class="section-subtitle" style="margin: 0;">Customize every detail and make your celebration unforgettable.</p>
+          </div>
+          <img class="cake-builder-hero-img" src="https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=900" alt="Custom decorated cake">
+        </div>
 
-      <div class="cake-builder-grid">
-        <!-- Visual Preview column (Left) -->
-        <div class="cake-preview-sticky">
-          <h3>Your Design Preview</h3>
-          
-          <div class="cake-visualizer" style="margin-top: 24px;">
-            <!-- Floating Toppings -->
-            <div class="cake-topping-visuals" id="preview-toppings"></div>
-            <!-- Top tier -->
-            <div class="cake-tier cake-tier-top" id="preview-tier-top" style="display: none;"></div>
-            <!-- Bottom / Base tier -->
-            <div class="cake-tier cake-tier-base" id="preview-tier-base"></div>
+        <div class="cake-builder-grid">
+          <!-- Visual Preview column (Left) -->
+          <div class="cake-preview-sticky">
+            <h3 class="cake-preview-heading">🎂 Your Dream Cake</h3>
+
+            <div class="cake-visualizer" id="cake-visualizer">
+              <img id="cake-preview-img" class="cake-preview-image" src="" alt="Cake preview">
+              <div class="cake-preview-badge" id="preview-badge-size">1 Tier • 1kg</div>
+              <div class="cake-preview-frosting-badge" id="preview-badge-frosting">Buttercream</div>
+              <div class="cake-topping-visuals" id="preview-toppings"></div>
+            </div>
+
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Sponge Base (<span id="preview-txt-flavor">Chocolate</span>)</span>
+                <span id="price-txt-flavor">Rs 600.00</span>
+              </div>
+              <div class="price-row">
+                <span>Size & Tiers (<span id="preview-txt-size">1 Tier - 1kg</span>)</span>
+                <span id="price-txt-size">+Rs 0.00</span>
+              </div>
+              <div class="price-row">
+                <span>Frosting Styling (<span id="preview-txt-frosting">Buttercream</span>)</span>
+                <span>+Rs 0.00</span>
+              </div>
+              <div class="price-row">
+                <span>Toppings Added</span>
+                <span id="price-txt-toppings">+Rs 0.00</span>
+              </div>
+              <div class="price-row">
+                <span>Eggless Formulation Option</span>
+                <span id="price-txt-eggless">+Rs 0.00</span>
+              </div>
+            </div>
+
+            <!-- Highlighted sticky price + Add to Cart -->
+            <div class="cake-price-highlight">
+              <div class="cake-price-highlight-label">💰 Total Price</div>
+              <div class="cake-price-highlight-value" id="price-txt-total">Rs 600.00</div>
+              <button class="btn btn-pink-cta" onclick="addCustomCakeToCart()">🛒 Add to Cart</button>
+            </div>
           </div>
 
-          <div class="price-breakdown">
-            <div class="price-row">
-              <span>Sponge Base (<span id="preview-txt-flavor">Chocolate</span>)</span>
-              <span id="price-txt-flavor">Rs 600.00</span>
+          <!-- Customizer wizard steps (Right) -->
+          <div class="cake-builder-steps">
+            <!-- Step node progress bar -->
+            <div class="step-indicator">
+              <div class="step-node-wrap">
+                <div class="step-node active" id="node-step-1">🍰</div>
+                <span class="step-node-label">Base</span>
+              </div>
+              <div class="step-node-wrap">
+                <div class="step-node" id="node-step-2">📏</div>
+                <span class="step-node-label">Size</span>
+              </div>
+              <div class="step-node-wrap">
+                <div class="step-node" id="node-step-3">🎨</div>
+                <span class="step-node-label">Frosting</span>
+              </div>
+              <div class="step-node-wrap">
+                <div class="step-node" id="node-step-4">🍒</div>
+                <span class="step-node-label">Toppings</span>
+              </div>
+              <div class="step-node-wrap">
+                <div class="step-node" id="node-step-5">✍️</div>
+                <span class="step-node-label">Message</span>
+              </div>
             </div>
-            <div class="price-row">
-              <span>Size & Tiers (<span id="preview-txt-size">1 Tier - 1kg</span>)</span>
-              <span id="price-txt-size">+Rs 0.00</span>
+
+            <!-- Step 1: Base Flavors -->
+            <div class="builder-step-pane active" id="pane-step-1">
+              <h3 style="margin-bottom: 10px;">Step 1: Choose Sponge Base</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">Select the delicious base recipe for your special custom cake.</p>
+              <div class="options-grid">
+                <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'vanilla', 500.00, 'Vanilla Bean')">
+                  <img class="option-box-img" src="https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=300" alt="Vanilla Bean">
+                  <span>Vanilla Sponge (Rs 500)</span>
+                </div>
+                <div class="option-box selected" onclick="selectCakeOption(event, 'flavor', 'chocolate', 600.00, 'Chocolate Fudge')">
+                  <img class="option-box-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=300" alt="Chocolate Fudge">
+                  <span>Chocolate Fudge (Rs 600)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'red-velvet', 650.00, 'Red Velvet')">
+                  <img class="option-box-img" src="https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?auto=format&fit=crop&q=80&w=300" alt="Red Velvet">
+                  <span>Red Velvet (Rs 650)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'pineapple', 550.00, 'Pineapple Paradise')">
+                  <img class="option-box-img" src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&q=80&w=300" alt="Pineapple Paradise">
+                  <span>Pineapple sponge (Rs 550)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'black-forest', 620.00, 'Black Forest')">
+                  <img class="option-box-img" src="https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=300" alt="Black Forest">
+                  <span>Black Forest (Rs 620)</span>
+                </div>
+              </div>
             </div>
-            <div class="price-row">
-              <span>Frosting Styling (<span id="preview-txt-frosting">Buttercream</span>)</span>
-              <span>+$0.00</span>
+
+            <!-- Step 2: Size and Tiers -->
+            <div class="builder-step-pane" id="pane-step-2">
+              <h3 style="margin-bottom: 10px;">Step 2: Dimensions & Tiers</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">Configure cake levels and weight depending on your guest count.</p>
+              <div class="options-grid">
+                <div class="option-box selected" onclick="selectCakeSize(event, '1', '1kg', 0.00, 'Single Tier - 1kg')">
+                  <i class="fa-solid fa-circle" style="font-size: 1rem;"></i>
+                  <span>1 Tier (1kg) (+Rs 0)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeSize(event, '1', '2kg', 400.00, 'Single Tier - 2kg')">
+                  <i class="fa-solid fa-circle" style="font-size: 1.4rem;"></i>
+                  <span>1 Tier (2kg) (+Rs 400)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeSize(event, '2', '3kg', 900.00, 'Double Tier - 3kg')">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>2 Tiers (3kg) (+Rs 900)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeSize(event, '2', '5kg', 1600.00, 'Double Tier - 5kg')">
+                  <i class="fa-solid fa-layer-group" style="font-size: 1.8rem;"></i>
+                  <span>2 Tiers (5kg) (+Rs 1600)</span>
+                </div>
+              </div>
             </div>
-            <div class="price-row">
-              <span>Toppings Added</span>
-              <span id="price-txt-toppings">+Rs 0.00</span>
+
+            <!-- Step 3: Frosting Type -->
+            <div class="builder-step-pane" id="pane-step-3">
+              <h3 style="margin-bottom: 10px;">Step 3: Frosting Styling</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">Choose the icing finish type for the outer texture of your cake.</p>
+              <div class="options-grid">
+                <div class="option-box selected" onclick="selectCakeOption(event, 'frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
+                  <i class="fa-solid fa-brush"></i>
+                  <span>Cream Buttercream</span>
+                </div>
+                <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'fondant', 150.00, 'Fondant Art')">
+                  <i class="fa-solid fa-palette"></i>
+                  <span>Smooth Fondant (+Rs 150)</span>
+                </div>
+                <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
+                  <i class="fa-solid fa-cloud"></i>
+                  <span>Whipped Cream</span>
+                </div>
+              </div>
             </div>
-            <div class="price-row">
-              <span>Eggless Formulation Option</span>
-              <span id="price-txt-eggless">+Rs 0.00</span>
+
+            <!-- Step 4: Toppings Selection -->
+            <div class="builder-step-pane" id="pane-step-4">
+              <h3 style="margin-bottom: 10px;">Step 4: Select Gourmet Toppings</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">Select multiple toppings. They will be artistically arranged by our bakers.</p>
+              <div class="options-grid">
+                <div class="option-box" id="toppingbox-berries" onclick="toggleCakeTopping('berries', 150.00)">
+                  <i class="fa-solid fa-seedling" style="color: var(--accent);"></i>
+                  <span>Fresh Berries (+Rs 150)</span>
+                </div>
+                <div class="option-box" id="toppingbox-sprinkles" onclick="toggleCakeTopping('sprinkles', 80.00)">
+                  <i class="fa-solid fa-ellipsis" style="color: var(--highlight);"></i>
+                  <span>Rainbow Sprinkles (+Rs 80)</span>
+                </div>
+                <div class="option-box" id="toppingbox-shavings" onclick="toggleCakeTopping('shavings', 100.00)">
+                  <i class="fa-solid fa-cookie-bite"></i>
+                  <span>Chocolate Shavings (+Rs 100)</span>
+                </div>
+                <div class="option-box" id="toppingbox-macarons" onclick="toggleCakeTopping('macarons', 250.00)">
+                  <i class="fa-solid fa-cheese"></i>
+                  <span>Parisian Macarons (+Rs 250)</span>
+                </div>
+              </div>
             </div>
-            <div class="price-row total">
-              <span>Estimated Cost</span>
-              <span id="price-txt-total">Rs 600.00</span>
+
+            <!-- Step 5: Message & Schedule Delivery -->
+            <div class="builder-step-pane" id="pane-step-5">
+              <h3 style="margin-bottom: 10px;">Step 5: Written message & Schedule</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Provide custom text writing on cake base and schedule delivery.</p>
+              
+              <div class="form-group" style="display: flex; gap: 10px; align-items: center; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <input type="checkbox" id="cake-eggless-toggle" onchange="toggleCakeEggless(this)" style="width: 20px; height: 20px; accent-color: var(--primary);">
+                <div>
+                  <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+Rs 100.00)</label>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);">Baked without eggs in dedicated allergen-free oven</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Written Message on Cake (Max 30 chars)</label>
+                <input type="text" id="cake-writing-msg" placeholder="E.g. Happy 10th Birthday Liam!" onkeyup="handleCakeMessageChange(this)">
+              </div>
+              
+              <div class="form-group-row">
+                <div class="form-group">
+                  <label>Preferred Delivery Date *</label>
+                  <input type="date" id="cake-date-val" required>
+                </div>
+                <div class="form-group">
+                  <label>Special Instructions</label>
+                  <input type="text" id="cake-notes-val" placeholder="Color theme, box wrapping, card...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Wizard control buttons -->
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 30px;">
+              <button class="btn btn-secondary" id="btn-builder-prev" onclick="moveBuilderStep(-1)" style="visibility: hidden;">Back</button>
+              <button class="btn btn-primary" id="btn-builder-next" onclick="moveBuilderStep(1)">Next Step</button>
             </div>
           </div>
         </div>
 
-        <!-- Customizer wizard steps (Right) -->
-        <div class="cake-builder-steps">
-          <!-- Step node progress bar -->
-          <div class="step-indicator">
-            <div class="step-node active" id="node-step-1">1</div>
-            <div class="step-node" id="node-step-2">2</div>
-            <div class="step-node" id="node-step-3">3</div>
-            <div class="step-node" id="node-step-4">4</div>
-            <div class="step-node" id="node-step-5">5</div>
-          </div>
+        <!-- Customer Confidence Strip -->
+        <div class="confidence-strip">
+          <div class="confidence-item">✅ Freshly Baked</div>
+          <div class="confidence-item">🎂 100% Custom Made</div>
+          <div class="confidence-item">🚚 Delivery Available</div>
+          <div class="confidence-item">⭐ 4.9 Customer Rating</div>
+        </div>
 
-          <!-- Step 1: Base Flavors -->
-          <div class="builder-step-pane active" id="pane-step-1">
-            <h3 style="margin-bottom: 10px;">Step 1: Choose Sponge Base</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Select the delicious base recipe for your special custom cake.</p>
-            <div class="options-grid">
-              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'vanilla', 500.00, 'Vanilla Bean')">
-                <i class="fa-solid fa-cake"></i>
-                <span>Vanilla Sponge (Rs 500)</span>
-              </div>
-              <div class="option-box selected" onclick="selectCakeOption(event, 'flavor', 'chocolate', 600.00, 'Chocolate Fudge')">
-                <i class="fa-solid fa-cake" style="color: #6d4c41;"></i>
-                <span>Chocolate Fudge (Rs 600)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'red-velvet', 650.00, 'Red Velvet')">
-                <i class="fa-solid fa-cake" style="color: var(--accent);"></i>
-                <span>Red Velvet (Rs 650)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'pineapple', 550.00, 'Pineapple Paradise')">
-                <i class="fa-solid fa-cake" style="color: var(--highlight);"></i>
-                <span>Pineapple sponge (Rs 550)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'black-forest', 620.00, 'Black Forest')">
-                <i class="fa-solid fa-cake" style="color: #3e2723;"></i>
-                <span>Black Forest (Rs 620)</span>
-              </div>
+        <!-- Previous Custom Cakes -->
+        <div style="margin-top: 60px;">
+          <h2 class="section-title text-center" style="display: block;">Previous Custom Cakes</h2>
+          <p class="section-subtitle text-center" style="margin-bottom: 10px;">A glimpse of dream cakes we've brought to life for our customers</p>
+          <div class="custom-gallery-slider">
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&q=80&w=400" alt="Unicorn Birthday Cake">
+              <div class="custom-gallery-caption">Magical Unicorn Birthday Cake</div>
             </div>
-          </div>
-
-          <!-- Step 2: Size and Tiers -->
-          <div class="builder-step-pane" id="pane-step-2">
-            <h3 style="margin-bottom: 10px;">Step 2: Dimensions & Tiers</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Configure cake levels and weight depending on your guest count.</p>
-            <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeSize(event, '1', '1kg', 0.00, 'Single Tier - 1kg')">
-                <i class="fa-solid fa-circle" style="font-size: 1rem;"></i>
-                <span>1 Tier (1kg) (+Rs 0)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeSize(event, '1', '2kg', 400.00, 'Single Tier - 2kg')">
-                <i class="fa-solid fa-circle" style="font-size: 1.4rem;"></i>
-                <span>1 Tier (2kg) (+Rs 400)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeSize(event, '2', '3kg', 900.00, 'Double Tier - 3kg')">
-                <i class="fa-solid fa-layer-group"></i>
-                <span>2 Tiers (3kg) (+Rs 900)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeSize(event, '2', '5kg', 1600.00, 'Double Tier - 5kg')">
-                <i class="fa-solid fa-layer-group" style="font-size: 1.8rem;"></i>
-                <span>2 Tiers (5kg) (+Rs 1600)</span>
-              </div>
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=400" alt="Rose Gold Wedding Cake">
+              <div class="custom-gallery-caption">Elegant Rose Gold Wedding Cake</div>
             </div>
-          </div>
-
-          <!-- Step 3: Frosting Type -->
-          <div class="builder-step-pane" id="pane-step-3">
-            <h3 style="margin-bottom: 10px;">Step 3: Frosting Styling</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Choose the icing finish type for the outer texture of your cake.</p>
-            <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeOption(event, 'frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
-                <i class="fa-solid fa-brush"></i>
-                <span>Cream Buttercream</span>
-              </div>
-              <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'fondant', 150.00, 'Fondant Art')">
-                <i class="fa-solid fa-palette"></i>
-                <span>Smooth Fondant (+Rs 150)</span>
-              </div>
-              <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
-                <i class="fa-solid fa-cloud"></i>
-                <span>Whipped Cream</span>
-              </div>
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1558636508-e0db3814bd1d?auto=format&fit=crop&q=80&w=400" alt="Rainbow Sprinkle Cake">
+              <div class="custom-gallery-caption">Rainbow Sprinkle Birthday Cake</div>
             </div>
-          </div>
-
-          <!-- Step 4: Toppings Selection -->
-          <div class="builder-step-pane" id="pane-step-4">
-            <h3 style="margin-bottom: 10px;">Step 4: Select Gourmet Toppings</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">Select multiple toppings. They will be artistically arranged by our bakers.</p>
-            <div class="options-grid">
-              <div class="option-box" id="toppingbox-berries" onclick="toggleCakeTopping('berries', 150.00)">
-                <i class="fa-solid fa-seedling" style="color: var(--accent);"></i>
-                <span>Fresh Berries (+Rs 150)</span>
-              </div>
-              <div class="option-box" id="toppingbox-sprinkles" onclick="toggleCakeTopping('sprinkles', 80.00)">
-                <i class="fa-solid fa-ellipsis" style="color: var(--highlight);"></i>
-                <span>Rainbow Sprinkles (+Rs 80)</span>
-              </div>
-              <div class="option-box" id="toppingbox-shavings" onclick="toggleCakeTopping('shavings', 100.00)">
-                <i class="fa-solid fa-cookie-bite"></i>
-                <span>Chocolate Shavings (+Rs 100)</span>
-              </div>
-              <div class="option-box" id="toppingbox-macarons" onclick="toggleCakeTopping('macarons', 250.00)">
-                <i class="fa-solid fa-cheese"></i>
-                <span>Parisian Macarons (+Rs 250)</span>
-              </div>
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=400" alt="Naked Buttercream Wedding Cake">
+              <div class="custom-gallery-caption">Naked Buttercream Wedding Cake</div>
             </div>
-          </div>
-
-          <!-- Step 5: Message & Schedule Delivery -->
-          <div class="builder-step-pane" id="pane-step-5">
-            <h3 style="margin-bottom: 10px;">Step 5: Written message & Schedule</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Provide custom text writing on cake base and schedule delivery.</p>
-            
-            <div class="form-group" style="display: flex; gap: 10px; align-items: center; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
-              <input type="checkbox" id="cake-eggless-toggle" onchange="toggleCakeEggless(this)" style="width: 20px; height: 20px; accent-color: var(--primary);">
-              <div>
-                <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+Rs 100.00)</label>
-                <span style="font-size: 0.75rem; color: var(--text-secondary);">Baked without eggs in dedicated allergen-free oven</span>
-              </div>
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=400" alt="Chocolate Truffle Cake">
+              <div class="custom-gallery-caption">Rich Chocolate Truffle Cake</div>
             </div>
-
-            <div class="form-group">
-              <label>Written Message on Cake (Max 30 chars)</label>
-              <input type="text" id="cake-writing-msg" placeholder="E.g. Happy 10th Birthday Liam!" onkeyup="handleCakeMessageChange(this)">
+            <div class="custom-gallery-slide">
+              <img src="https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?auto=format&fit=crop&q=80&w=400" alt="Red Velvet Cake">
+              <div class="custom-gallery-caption">Classic Red Velvet Cake</div>
             </div>
-            
-            <div class="form-group-row">
-              <div class="form-group">
-                <label>Preferred Delivery Date *</label>
-                <input type="date" id="cake-date-val" required>
-              </div>
-              <div class="form-group">
-                <label>Special Instructions</label>
-                <input type="text" id="cake-notes-val" placeholder="Color theme, box wrapping, card...">
-              </div>
-            </div>
-          </div>
-
-          <!-- Wizard control buttons -->
-          <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 30px;">
-            <button class="btn btn-secondary" id="btn-builder-prev" onclick="moveBuilderStep(-1)" style="visibility: hidden;">Back</button>
-            <button class="btn btn-primary" id="btn-builder-next" onclick="moveBuilderStep(1)">Next Step</button>
           </div>
         </div>
       </div>
@@ -1845,7 +1920,7 @@ function renderCustomCakes() {
   // Set default values in builder state
   state.cakeCustomizer = {
     flavor: 'chocolate',
-    flavorPrice: 28.00,
+    flavorPrice: 600.00,
     flavorText: 'Chocolate Fudge',
     size: '1kg',
     tiers: '1',
@@ -1952,45 +2027,34 @@ window.handleCakeMessageChange = function(input) {
 };
 
 function updateCakeVisualizer() {
-  // Update Visual Tiers colors
-  const baseTier = document.getElementById('preview-tier-base');
-  const topTier = document.getElementById('preview-tier-top');
-  
-  const flavorColors = {
-    vanilla: { bg: '#FFF8E7', border: '#D2691E' },
-    chocolate: { bg: '#5D4037', border: '#3E2723' },
-    'red-velvet': { bg: '#C62828', border: '#8E0000' },
-    pineapple: { bg: '#FFF59D', border: '#FBC02D' },
-    'black-forest': { bg: '#4E342E', border: '#270F0A' }
+  // Real cake photo per flavor, swaps live as user picks a base
+  const flavorImages = {
+    vanilla: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=600',
+    chocolate: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=600',
+    'red-velvet': 'https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?auto=format&fit=crop&q=80&w=600',
+    pineapple: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&q=80&w=600',
+    'black-forest': 'https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=600'
   };
-  
-  const currentColors = flavorColors[state.cakeCustomizer.flavor] || flavorColors.chocolate;
-  
-  baseTier.style.backgroundColor = currentColors.bg;
-  baseTier.style.borderColor = currentColors.border;
-  topTier.style.backgroundColor = currentColors.bg;
-  topTier.style.borderColor = currentColors.border;
 
-  // Manage Tiers displaying
-  if (state.cakeCustomizer.tiers === '2') {
-    topTier.style.display = 'block';
-  } else {
-    topTier.style.display = 'none';
-  }
+  const previewImg = document.getElementById('cake-preview-img');
+  previewImg.style.opacity = '0';
+  setTimeout(() => {
+    previewImg.src = flavorImages[state.cakeCustomizer.flavor] || flavorImages.chocolate;
+    previewImg.style.opacity = '1';
+  }, 150);
 
-  // Manage Toppings preview
+  // Size badge
+  document.getElementById('preview-badge-size').innerText = state.cakeCustomizer.sizeText;
+
+  // Frosting badge
+  document.getElementById('preview-badge-frosting').innerText = state.cakeCustomizer.frostingText.replace(' Sweet', '').replace(' Art', '').replace(' Frosting', '');
+
+  // Manage Toppings preview (emoji chips)
+  const toppingEmojis = { berries: '🍓 Berries', sprinkles: '🌈 Sprinkles', shavings: '🍫 Shavings', macarons: '🧁 Macarons' };
   const toppingsContainer = document.getElementById('preview-toppings');
   let toppingsHtml = '';
   state.cakeCustomizer.toppings.forEach(top => {
-    if (top.name === 'berries') {
-      toppingsHtml += `<div class="topping-cherry" style="background-color: var(--accent);"></div><div class="topping-cherry" style="background-color: #880E4F;"></div>`;
-    } else if (top.name === 'sprinkles') {
-      toppingsHtml += `<div style="width: 6px; height: 6px; background-color: var(--highlight); border-radius: 50%;"></div><div style="width: 6px; height: 6px; background-color: cyan; border-radius: 50%;"></div><div style="width: 6px; height: 6px; background-color: magenta; border-radius: 50%;"></div>`;
-    } else if (top.name === 'shavings') {
-      toppingsHtml += `<i class="fa-solid fa-cookie" style="font-size: 0.8rem; color: #3e2723;"></i>`;
-    } else if (top.name === 'macarons') {
-      toppingsHtml += `<i class="fa-solid fa-cheese" style="font-size: 0.9rem; color: var(--secondary);"></i>`;
-    }
+    toppingsHtml += `<span class="topping-chip">${toppingEmojis[top.name] || top.name}</span>`;
   });
   toppingsContainer.innerHTML = toppingsHtml;
 
@@ -2663,7 +2727,7 @@ window.viewOrderDetails = function(orderId) {
 };
 
 // Admin Products catalog management
-window.handleProductSubmit = function(event) {
+window.handleProductSubmit = async function(event) {
   event.preventDefault();
   const name = document.getElementById('admin-prod-name').value.trim();
   const category = document.getElementById('admin-prod-cat').value;
@@ -2671,7 +2735,10 @@ window.handleProductSubmit = function(event) {
   const image = document.getElementById('admin-prod-image').value.trim();
   const description = document.getElementById('admin-prod-desc').value.trim();
 
-  if (state.editingProductId) {
+  const isEditing = !!state.editingProductId;
+  let savedProduct;
+
+  if (isEditing) {
     // Edit existing product
     const idx = state.products.findIndex(p => p.id === state.editingProductId);
     if (idx > -1) {
@@ -2683,13 +2750,13 @@ window.handleProductSubmit = function(event) {
         image,
         description
       };
+      savedProduct = state.products[idx];
     }
     state.editingProductId = null;
-    alert('Product details updated successfully!');
   } else {
     // Add new product
     const newId = state.products.length > 0 ? Math.max(...state.products.map(p => p.id)) + 1 : 1;
-    const newProd = {
+    savedProduct = {
       id: newId,
       name,
       category,
@@ -2700,8 +2767,15 @@ window.handleProductSubmit = function(event) {
       reviewsCount: 0,
       inStock: true
     };
-    state.products.push(newProd);
-    alert('New cake product added successfully to the catalog!');
+    state.products.push(savedProduct);
+  }
+
+  try {
+    await saveProductToCloud(savedProduct);
+    alert(isEditing ? 'Product details updated successfully — visible to everyone now!' : 'New cake product added successfully — it is now live for every visitor!');
+  } catch (err) {
+    console.error(err);
+    alert('Saved on this device, but could not sync to the cloud database. Please check your internet connection.');
   }
 
   saveProductsToStorage();
@@ -2731,11 +2805,17 @@ window.cancelProductEdit = function() {
   renderAdmin();
 };
 
-window.deleteProduct = function(prodId) {
+window.deleteProduct = async function(prodId) {
   if (confirm('Are you sure you want to delete this product from the store catalog?')) {
     state.products = state.products.filter(p => p.id !== prodId);
     saveProductsToStorage();
     renderAdmin();
+    try {
+      await deleteProductFromCloud(prodId);
+    } catch (err) {
+      console.error(err);
+      alert('Deleted on this device, but could not sync the deletion to the cloud database.');
+    }
   }
 };
 
