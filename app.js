@@ -255,9 +255,9 @@ function renderHome() {
     `;
   });
 
-  // Featured products html (Take 3 best rated)
+  // Featured products html (Take 8 best rated)
   let productsHtml = '';
-  const sorted = [...state.products].sort((a,b) => b.rating - a.rating).slice(0, 3);
+  const sorted = [...state.products].sort((a,b) => b.rating - a.rating).slice(0, 8);
   sorted.forEach(prod => {
     productsHtml += renderProductCardHTML(prod);
   });
@@ -284,45 +284,70 @@ function renderHome() {
     `;
   });
 
+  // Hero slider images (rotates automatically)
+  const heroImages = [
+    'https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&q=80&w=1600',
+    'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=1600',
+    'https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=1600'
+  ];
+  let heroSlidesHtml = '';
+  heroImages.forEach((img, idx) => {
+    heroSlidesHtml += `<div class="hero-slide ${idx === 0 ? 'active' : ''}" style="background-image: url('${img}');"></div>`;
+  });
+
   main.innerHTML = `
     <!-- Hero Section -->
     <section class="hero">
+      ${heroSlidesHtml}
       <div class="container">
         <div class="hero-glass-card">
           <span style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; display: block; margin-bottom: 12px;">Artisanal & Premium Bakery</span>
           <h1>Freshly Baked Happiness Every Day</h1>
           <p>Delicious handcrafted cakes, cupcakes, pastries, cookies, breads, and desserts made fresh with premium organic ingredients for every celebration.</p>
           <div class="hero-buttons">
-            <button class="btn btn-primary" onclick="navigateTo('shop')">Order Now</button>
+            <button class="btn btn-primary" onclick="navigateTo('shop')"><i class="fa-solid fa-cart-shopping"></i> Order Now</button>
+            <a href="https://wa.me/923001234567?text=Hi!%20I'd%20like%20to%20place%20an%20order" target="_blank" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp Order</a>
             <button class="btn btn-secondary" onclick="navigateTo('custom-cakes')"><i class="fa-solid fa-wand-magic-sparkles"></i> Custom Cakes</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Features -->
+    <!-- Special Offer Banner -->
+    <section class="offer-banner">
+      <div class="container offer-banner-inner">
+        <span class="offer-item">🎉 10% OFF on Your First Order</span>
+        <span class="offer-item">🚚 Free Delivery on Orders Above Rs. 3000</span>
+      </div>
+    </section>
+
+    <!-- Why Choose Us -->
     <section class="section-padding" style="background-color: #FFFFFF;">
       <div class="container">
+        <div class="text-center">
+          <h2 class="section-title">Why Choose Us</h2>
+          <p class="section-subtitle">What makes Sweet Crumbs the bakery you can always trust</p>
+        </div>
         <div class="features-grid">
           <div class="feature-card">
-            <div class="feature-icon-wrapper"><i class="fa-solid fa-cake"></i></div>
-            <h3>Baked Fresh Daily</h3>
-            <p>Our bakers start before dawn to ensure your treats are baked and delivered fresh every single day.</p>
+            <div class="feature-icon-wrapper"><i class="fa-solid fa-seedling"></i></div>
+            <h3>Fresh Ingredients</h3>
+            <p>We source only high-quality, fresh ingredients: real vanilla, rich chocolates, and fresh fruits, baked daily.</p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon-wrapper"><i class="fa-solid fa-seedling"></i></div>
-            <h3>Premium Ingredients</h3>
-            <p>We source only high-quality, organic ingredients: real Madagascan vanilla, rich Belgian chocolates, and fresh fruits.</p>
+            <div class="feature-icon-wrapper"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Custom Cakes</h3>
+            <p>Design your own dream cake with our custom cake builder — pick flavors, sizes, frosting, and toppings.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon-wrapper"><i class="fa-solid fa-truck-fast"></i></div>
             <h3>Same Day Delivery</h3>
-            <p>Craving sweets? Order before 2 PM and get secure doorstep delivery within hours in our temperature-controlled vans.</p>
+            <p>Craving sweets? Order before 2 PM and get secure doorstep delivery within hours across the city.</p>
           </div>
           <div class="feature-card">
-            <div class="feature-icon-wrapper"><i class="fa-solid fa-shield-halved"></i></div>
-            <h3>100% Safe Payments</h3>
-            <p>Your online transactions are secure with leading fully encrypted credit gateways, Apple Pay, and Google Pay.</p>
+            <div class="feature-icon-wrapper"><i class="fa-solid fa-tag"></i></div>
+            <h3>Affordable Prices</h3>
+            <p>Premium quality bakes at prices that make every celebration sweeter, without breaking the bank.</p>
           </div>
         </div>
       </div>
@@ -339,12 +364,12 @@ function renderHome() {
       </div>
     </section>
 
-    <!-- Featured Products -->
+    <!-- Featured Cakes -->
     <section class="section-padding" style="background-color: #FFFFFF; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
       <div class="container">
         <div class="text-center">
-          <h2 class="section-title">Chef's Signature Selections</h2>
-          <p class="section-subtitle">Customer favorites made with artisan passion and premium toppings</p>
+          <h2 class="section-title">Featured Cakes</h2>
+          <p class="section-subtitle">Our best-selling cakes, loved by customers again and again</p>
         </div>
         <div class="products-grid">
           ${productsHtml}
@@ -382,7 +407,7 @@ function renderHome() {
     <!-- Testimonials slider -->
     <section class="section-padding" style="background-color: var(--card-bg);">
       <div class="container text-center">
-        <h2 class="section-title">Crumb Stories</h2>
+        <h2 class="section-title">Customer Reviews</h2>
         <p class="section-subtitle">Read what our gourmet dessert lovers say about our bakeshop</p>
         
         <div style="position: relative; max-width: 900px; margin: 0 auto; padding: 0 40px;">
@@ -401,6 +426,17 @@ function renderHome() {
       </div>
     </section>
   `;
+
+  // Auto-rotate hero slider images
+  if (window.heroSliderInterval) clearInterval(window.heroSliderInterval);
+  let heroSlideIndex = 0;
+  window.heroSliderInterval = setInterval(() => {
+    const slides = document.querySelectorAll('.hero-slide');
+    if (slides.length === 0) { clearInterval(window.heroSliderInterval); return; }
+    slides[heroSlideIndex].classList.remove('active');
+    heroSlideIndex = (heroSlideIndex + 1) % slides.length;
+    slides[heroSlideIndex].classList.add('active');
+  }, 4000);
 }
 
 let activeTestimonialIndex = 0;
@@ -952,16 +988,9 @@ function renderContact() {
             </div>
           </div>
           
-          <!-- Mock Map -->
+          <!-- Google Map -->
           <div class="cart-summary-card" style="width: 100%; overflow: hidden; padding: 0;">
-            <div style="background-color: var(--secondary); height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-radius: var(--radius); position: relative;">
-              <i class="fa-solid fa-map-location-dot" style="font-size: 3rem; color: var(--primary); margin-bottom: 12px;"></i>
-              <h4 style="color: var(--primary);">Interactive Google Map</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; margin-top: 4px;">Double click to navigate directly to Baker Ave directions</p>
-              
-              <!-- styled map pin decorative layout -->
-              <div style="position: absolute; width: 12px; height: 12px; background-color: var(--accent); border: 2px solid #FFF; border-radius: 50%; top: 40%; left: 55%; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>
-            </div>
+            <iframe class="map-embed" src="https://www.google.com/maps?q=Gulberg+III,+Lahore,+Pakistan&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
       </div>
