@@ -343,7 +343,7 @@ header {
 .hero {
   position: relative;
   min-height: calc(85vh - 80px);
- background: linear-gradient(rgba(45, 45, 45, 0.4), rgba(45, 45, 45, 0.4)), linear-gradient(135deg, #F3C77F, #F5B8C9);
+  background: linear-gradient(rgba(45, 45, 45, 0.3), rgba(45, 45, 45, 0.3)), url('assets/bakery_hero_bg.jpg') no-repeat center center/cover;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -451,38 +451,48 @@ header {
 }
 
 .category-circle-card {
+  position: relative;
   flex: 0 0 140px;
   background: var(--card-bg);
   border-radius: 50%;
   aspect-ratio: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   box-shadow: var(--shadow-md);
   cursor: pointer;
   border: 1px solid var(--border-color);
   transition: var(--transition);
   scroll-snap-align: start;
+  overflow: hidden;
 }
 
 .category-circle-card:hover, .category-circle-card.active {
-  background-color: var(--secondary);
   border-color: var(--primary);
   transform: scale(1.05);
 }
 
-.category-circle-card i {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: 8px;
+.category-circle-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .category-circle-card span {
-  font-size: 0.85rem;
+  position: relative;
+  z-index: 2;
+  font-size: 0.8rem;
   font-weight: 600;
+  color: #FFFFFF;
   text-align: center;
-  padding: 0 8px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  background: rgba(45, 45, 45, 0.6);
+  border-radius: 20px;
 }
 
 /* Products Grid (Shop Page) */
