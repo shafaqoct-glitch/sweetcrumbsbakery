@@ -249,7 +249,7 @@ function renderHome() {
   window.bakeryCategories.slice(1, 7).forEach(cat => {
     categoriesHtml += `
       <div class="category-circle-card" onclick="navigateTo('shop', { category: '${cat.id}' })">
-        <i class="fa-solid ${cat.icon}"></i>
+        <img src="${cat.image}" alt="${cat.name}" class="category-circle-img">
         <span>${cat.name}</span>
       </div>
     `;
@@ -545,7 +545,7 @@ function renderProductCardHTML(prod) {
         <h3 class="product-title">${prod.name}</h3>
         <p class="product-desc">${prod.description}</p>
         <div class="product-footer">
-          <span class="product-price"> Rs ${prod.price.toFixed(2)}</span>
+          <span class="product-price">Rs ${prod.price.toFixed(2)}</span>
           <button class="btn btn-primary" onclick="addToCart(${prod.id})" style="padding: 8px 16px; font-size: 0.85rem; border-radius: var(--radius-sm);" ${!prod.inStock ? 'disabled' : ''}>
             <i class="fa-solid fa-cart-plus"></i> Add
           </button>
@@ -884,7 +884,7 @@ function renderContact() {
         <p class="section-subtitle">Have questions or want to plan custom cakes? Stop by or fill out our quick form</p>
       </div>
 
-      <div class="cart-grid" style="grid-template-columns: 1.2fr 1fr;">
+      <div class="contact-grid">
         <!-- Left: Form -->
         <div class="cart-items-container">
           <h3 style="margin-bottom: 24px;">Send Us A Message</h3>
@@ -901,7 +901,7 @@ function renderContact() {
             </div>
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="tel" id="contact-phone" placeholder="E.g. +1 (555) 012-3456">
+              <input type="tel" id="contact-phone" placeholder="E.g. +92 300 1234567">
             </div>
             <div class="form-group">
               <label>Event Type / Subject *</label>
@@ -930,7 +930,7 @@ function renderContact() {
                 <i class="fa-solid fa-location-dot" style="color: var(--primary); font-size: 1.2rem; margin-top: 3px;"></i>
                 <div>
                   <h4 style="margin-bottom: 4px;">Bakery Location</h4>
-                  <p style="color: var(--text-secondary);">458 Baker Avenue, Sweet Sugar District, New York, NY 10001</p>
+                  <p style="color: var(--text-secondary);">458 Baker Avenue, Gulberg III, Lahore, Pakistan</p>
                 </div>
               </div>
               
@@ -946,7 +946,7 @@ function renderContact() {
                 <i class="fa-solid fa-phone" style="color: var(--primary); font-size: 1.2rem; margin-top: 3px;"></i>
                 <div>
                   <h4 style="margin-bottom: 4px;">Call Us Directly</h4>
-                  <p style="color: var(--text-secondary);">+1 (555) 019-2834</p>
+                  <p style="color: var(--text-secondary);">+92 300 1234567</p>
                 </div>
               </div>
             </div>
@@ -1006,7 +1006,7 @@ window.openQuickView = function(productId) {
           <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">Eggless Variant Option:</label>
           <div style="display: flex; gap: 10px;">
             <button class="btn btn-secondary active" id="quick-egg-no" onclick="toggleQuickEggless(false)" style="padding: 6px 14px; font-size: 0.8rem; border-color: var(--primary);">Standard (With Egg)</button>
-            <button class="btn btn-secondary" id="quick-egg-yes" onclick="toggleQuickEggless(true)" style="padding: 6px 14px; font-size: 0.8rem;">Eggless (+Rs 2500.00)</button>
+            <button class="btn btn-secondary" id="quick-egg-yes" onclick="toggleQuickEggless(true)" style="padding: 6px 14px; font-size: 0.8rem;">Eggless (+Rs 100.00)</button>
           </div>
         </div>
 
@@ -1060,7 +1060,7 @@ window.addToCart = function(productId, quantity = 1, eggless = false) {
   if (!prod) return;
 
   const basePrice = prod.price;
-  const finalPrice = eggless ? basePrice + 2.00 : basePrice;
+  const finalPrice = eggless ? basePrice + 100.00 : basePrice;
   const note = eggless ? 'Eggless option selected' : '';
 
   // Check if item already in cart with same configurations
@@ -1218,7 +1218,7 @@ function renderCart() {
 
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
-  const delivery = subtotal >= 50 ? 0.00 : 5.00;
+  const delivery = subtotal >= 5000 ? 0.00 : 200.00;
   
   let discount = 0;
   if (state.appliedCoupon) {
@@ -1325,7 +1325,7 @@ function renderCheckout() {
 
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
-  const delivery = subtotal >= 50 ? 0.00 : 5.00;
+  const delivery = subtotal >= 5000 ? 0.00 : 200.00;
   
   let discount = 0;
   if (state.appliedCoupon) {
@@ -1375,7 +1375,7 @@ function renderCheckout() {
               </div>
               <div class="form-group">
                 <label>Phone Number *</label>
-                <input type="tel" required id="checkout-phone" placeholder="+1 (555) 012-3456">
+                <input type="tel" required id="checkout-phone" placeholder="+92 300 1234567">
               </div>
             </div>
 
@@ -1387,7 +1387,7 @@ function renderCheckout() {
             <div class="form-group-row">
               <div class="form-group">
                 <label>City *</label>
-                <input type="text" required id="checkout-city" placeholder="New York">
+                <input type="text" required id="checkout-city" placeholder="Lahore">
               </div>
               <div class="form-group">
                 <label>ZIP/Postal Code *</label>
@@ -1474,7 +1474,7 @@ function renderCheckout() {
               ${state.appliedCoupon ? `
                 <div class="price-row" style="color: var(--accent); font-weight: 600;">
                   <span>Discount (${state.appliedCoupon.code})</span>
-                  <span>-$${discount.toFixed(2)}</span>
+                  <span>-Rs ${discount.toFixed(2)}</span>
                 </div>
               ` : ''}
               
@@ -1541,7 +1541,7 @@ window.handlePlaceOrder = function(event) {
 
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
-  const delivery = subtotal >= 50 ? 0.00 : 5.00;
+  const delivery = subtotal >= 5000 ? 0.00 : 200.00;
   
   let discount = 0;
   if (state.appliedCoupon) {
@@ -1617,8 +1617,7 @@ function renderCustomCakes() {
   const main = document.getElementById('main-content');
   activeBuilderStep = 1;
 
-  main.innerHTML =
-    updateCakeVisualizer();`
+  main.innerHTML = `
     <div class="container section-padding">
       <div class="text-center">
         <h1 class="section-title">Design Your Custom Cake</h1>
@@ -1642,7 +1641,7 @@ function renderCustomCakes() {
           <div class="price-breakdown">
             <div class="price-row">
               <span>Sponge Base (<span id="preview-txt-flavor">Chocolate</span>)</span>
-              <span id="price-txt-flavor">Rs 28.00</span>
+              <span id="price-txt-flavor">Rs 600.00</span>
             </div>
             <div class="price-row">
               <span>Size & Tiers (<span id="preview-txt-size">1 Tier - 1kg</span>)</span>
@@ -1650,7 +1649,7 @@ function renderCustomCakes() {
             </div>
             <div class="price-row">
               <span>Frosting Styling (<span id="preview-txt-frosting">Buttercream</span>)</span>
-              <span>+Rs 0.00</span>
+              <span>+$0.00</span>
             </div>
             <div class="price-row">
               <span>Toppings Added</span>
@@ -1662,7 +1661,7 @@ function renderCustomCakes() {
             </div>
             <div class="price-row total">
               <span>Estimated Cost</span>
-              <span id="price-txt-total">Rs 28.00</span>
+              <span id="price-txt-total">Rs 600.00</span>
             </div>
           </div>
         </div>
@@ -1683,25 +1682,25 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 1: Choose Sponge Base</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Select the delicious base recipe for your special custom cake.</p>
             <div class="options-grid">
-              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'vanilla', 25.00, 'Vanilla Bean')">
-<div class="option-box selected" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
-                <span>Vanilla Sponge (Rs 25)</span>
+              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'vanilla', 500.00, 'Vanilla Bean')">
+                <i class="fa-solid fa-cake"></i>
+                <span>Vanilla Sponge (Rs 500)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'chocolate', 28.00, 'Chocolate Fudge')">
+              <div class="option-box selected" onclick="selectCakeOption(event, 'flavor', 'chocolate', 600.00, 'Chocolate Fudge')">
                 <i class="fa-solid fa-cake" style="color: #6d4c41;"></i>
-                <span>Chocolate Fudge (Rs 28)</span>
+                <span>Chocolate Fudge (Rs 600)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'red-velvet', 30.00, 'Red Velvet')">
+              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'red-velvet', 650.00, 'Red Velvet')">
                 <i class="fa-solid fa-cake" style="color: var(--accent);"></i>
-                <span>Red Velvet ($30)</span>
+                <span>Red Velvet (Rs 650)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'pineapple', 26.00, 'Pineapple Paradise')">
+              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'pineapple', 550.00, 'Pineapple Paradise')">
                 <i class="fa-solid fa-cake" style="color: var(--highlight);"></i>
-                <span>Pineapple sponge (Rs 26)</span>
+                <span>Pineapple sponge (Rs 550)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'flavor', 'black-forest', 29.00, 'Black Forest')">
+              <div class="option-box" onclick="selectCakeOption(event, 'flavor', 'black-forest', 620.00, 'Black Forest')">
                 <i class="fa-solid fa-cake" style="color: #3e2723;"></i>
-                <span>Black Forest (Rs 29)</span>
+                <span>Black Forest (Rs 620)</span>
               </div>
             </div>
           </div>
@@ -1711,21 +1710,21 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 2: Dimensions & Tiers</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Configure cake levels and weight depending on your guest count.</p>
             <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeSize(event ,'1', '1kg', 0.00, 'Single Tier - 1kg')">
+              <div class="option-box selected" onclick="selectCakeSize(event, '1', '1kg', 0.00, 'Single Tier - 1kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1rem;"></i>
                 <span>1 Tier (1kg) (+Rs 0)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize(event ,'1', '2kg', 15.00, 'Single Tier - 2kg')">
+              <div class="option-box" onclick="selectCakeSize(event, '1', '2kg', 400.00, 'Single Tier - 2kg')">
                 <i class="fa-solid fa-circle" style="font-size: 1.4rem;"></i>
-                <span>1 Tier (2kg) (+Rs 15)</span>
+                <span>1 Tier (2kg) (+Rs 400)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize(event ,'2', '3kg', 35.00, 'Double Tier - 3kg')">
+              <div class="option-box" onclick="selectCakeSize(event, '2', '3kg', 900.00, 'Double Tier - 3kg')">
                 <i class="fa-solid fa-layer-group"></i>
-                <span>2 Tiers (3kg) (+Rs 35)</span>
+                <span>2 Tiers (3kg) (+Rs 900)</span>
               </div>
-              <div class="option-box" onclick="selectCakeSize(event ,'2', '5kg', 65.00, 'Double Tier - 5kg')">
+              <div class="option-box" onclick="selectCakeSize(event, '2', '5kg', 1600.00, 'Double Tier - 5kg')">
                 <i class="fa-solid fa-layer-group" style="font-size: 1.8rem;"></i>
-                <span>2 Tiers (5kg) (+Rs 65)</span>
+                <span>2 Tiers (5kg) (+Rs 1600)</span>
               </div>
             </div>
           </div>
@@ -1735,15 +1734,15 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 3: Frosting Styling</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Choose the icing finish type for the outer texture of your cake.</p>
             <div class="options-grid">
-              <div class="option-box selected" onclick="selectCakeOption(event ,'frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
+              <div class="option-box selected" onclick="selectCakeOption(event, 'frosting', 'buttercream', 0.00, 'Buttercream Sweet')">
                 <i class="fa-solid fa-brush"></i>
                 <span>Cream Buttercream</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'fondant', 5.00, 'Fondant Art')">
+              <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'fondant', 150.00, 'Fondant Art')">
                 <i class="fa-solid fa-palette"></i>
-                <span>Smooth Fondant (+Rs 5)</span>
+                <span>Smooth Fondant (+Rs 150)</span>
               </div>
-              <div class="option-box" onclick="selectCakeOption(event ,'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
+              <div class="option-box" onclick="selectCakeOption(event, 'frosting', 'whipped-cream', 0.00, 'Whipped Frosting')">
                 <i class="fa-solid fa-cloud"></i>
                 <span>Whipped Cream</span>
               </div>
@@ -1755,21 +1754,21 @@ function renderCustomCakes() {
             <h3 style="margin-bottom: 10px;">Step 4: Select Gourmet Toppings</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem;">Select multiple toppings. They will be artistically arranged by our bakers.</p>
             <div class="options-grid">
-              <div class="option-box" id="toppingbox-berries" onclick="toggleCakeTopping('berries', 5.00)">
+              <div class="option-box" id="toppingbox-berries" onclick="toggleCakeTopping('berries', 150.00)">
                 <i class="fa-solid fa-seedling" style="color: var(--accent);"></i>
-                <span>Fresh Berries (+Rs 5)</span>
+                <span>Fresh Berries (+Rs 150)</span>
               </div>
-              <div class="option-box" id="toppingbox-sprinkles" onclick="toggleCakeTopping('sprinkles', 2.00)">
+              <div class="option-box" id="toppingbox-sprinkles" onclick="toggleCakeTopping('sprinkles', 80.00)">
                 <i class="fa-solid fa-ellipsis" style="color: var(--highlight);"></i>
-                <span>Rainbow Sprinkles (+$2)</span>
+                <span>Rainbow Sprinkles (+Rs 80)</span>
               </div>
-              <div class="option-box" id="toppingbox-shavings" onclick="toggleCakeTopping('shavings', 3.00)">
+              <div class="option-box" id="toppingbox-shavings" onclick="toggleCakeTopping('shavings', 100.00)">
                 <i class="fa-solid fa-cookie-bite"></i>
-                <span>Chocolate Shavings (+Rs 3)</span>
+                <span>Chocolate Shavings (+Rs 100)</span>
               </div>
-              <div class="option-box" id="toppingbox-macarons" onclick="toggleCakeTopping('macarons', 8.00)">
+              <div class="option-box" id="toppingbox-macarons" onclick="toggleCakeTopping('macarons', 250.00)">
                 <i class="fa-solid fa-cheese"></i>
-                <span>Parisian Macarons (+Rs 8)</span>
+                <span>Parisian Macarons (+Rs 250)</span>
               </div>
             </div>
           </div>
@@ -1782,7 +1781,7 @@ function renderCustomCakes() {
             <div class="form-group" style="display: flex; gap: 10px; align-items: center; border: 1px solid var(--border-color); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px;">
               <input type="checkbox" id="cake-eggless-toggle" onchange="toggleCakeEggless(this)" style="width: 20px; height: 20px; accent-color: var(--primary);">
               <div>
-                <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+RS 3.00)</label>
+                <label for="cake-eggless-toggle" style="font-weight: 600; cursor: pointer; display: block; margin: 0;">100% Eggless Sponge Option (+Rs 100.00)</label>
                 <span style="font-size: 0.75rem; color: var(--text-secondary);">Baked without eggs in dedicated allergen-free oven</span>
               </div>
             </div>
@@ -1869,7 +1868,7 @@ window.moveBuilderStep = function(delta) {
   document.getElementById('btn-builder-next').innerHTML = activeBuilderStep === 5 ? '<i class="fa-solid fa-cart-plus"></i> Add To Bag' : 'Next Step';
 };
 
-window.selectCakeOption = function(event, optionType, value , price, text) {
+window.selectCakeOption = function(event, optionType, value, price, text) {
   state.cakeCustomizer[optionType] = value;
   state.cakeCustomizer[optionType + 'Price'] = price;
   state.cakeCustomizer[optionType + 'Text'] = text;
@@ -1884,7 +1883,7 @@ window.selectCakeOption = function(event, optionType, value , price, text) {
   updateCakeVisualizer();
 };
 
-window.selectCakeSize = function(tiers, size, price, text) {
+window.selectCakeSize = function(event, tiers, size, price, text) {
   state.cakeCustomizer.tiers = tiers;
   state.cakeCustomizer.size = size;
   state.cakeCustomizer.sizePrice = price;
@@ -1971,14 +1970,14 @@ function updateCakeVisualizer() {
   document.getElementById('price-txt-flavor').innerText = `Rs ${state.cakeCustomizer.flavorPrice.toFixed(2)}`;
   
   document.getElementById('preview-txt-size').innerText = state.cakeCustomizer.sizeText;
-  document.getElementById('price-txt-size').innerText = `+Rs $${state.cakeCustomizer.sizePrice.toFixed(2)}`;
+  document.getElementById('price-txt-size').innerText = `+Rs ${state.cakeCustomizer.sizePrice.toFixed(2)}`;
   
   document.getElementById('preview-txt-frosting').innerText = state.cakeCustomizer.frostingText;
   
   const toppingsCost = state.cakeCustomizer.toppings.reduce((sum, t) => sum + t.price, 0);
   document.getElementById('price-txt-toppings').innerText = `+Rs ${toppingsCost.toFixed(2)}`;
   
-  const egglessCost = state.cakeCustomizer.eggless ? 3.00 : 0.00;
+  const egglessCost = state.cakeCustomizer.eggless ? 100.00 : 0.00;
   document.getElementById('price-txt-eggless').innerText = `+Rs ${egglessCost.toFixed(2)}`;
 
   // Calculate grand total cost
@@ -2185,7 +2184,7 @@ function renderAccount() {
               </div>
               <div class="form-group">
                 <label>Primary Phone Number</label>
-                <input type="text" value="+1 (555) 987-6543" readonly>
+                <input type="text" value="+92 300 1234567" readonly>
               </div>
               <p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic;">* Profile changes are disabled in guest preview mode.</p>
             </div>
@@ -2345,7 +2344,7 @@ function renderAdmin() {
               <div class="analytic-card">
                 <div class="analytic-info">
                   <h4>Total Revenue</h4>
-                  <span>RS ${totalRevenue.toFixed(2)}</span>
+                  <span>Rs ${totalRevenue.toFixed(2)}</span>
                 </div>
                 <i class="fa-solid fa-dollar-sign" style="font-size: 2rem; color: var(--primary); opacity: 0.3;"></i>
               </div>
