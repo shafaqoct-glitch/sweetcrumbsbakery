@@ -158,6 +158,18 @@ window.bakeryProducts = [
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=600',
     tags: ['Daily Baked', 'Sourdough'],
     inStock: true
+  },
+  {
+    id: 13,
+    name: 'Rainbow Sprinkle Birthday Cake',
+    category: 'birthday-cakes',
+    description: 'Fun and colorful vanilla sponge cake layered with buttercream frosting and topped with a generous shower of rainbow sprinkles. Perfect for birthdays and celebrations.',
+    price: 3400,
+    rating: 4.9,
+    reviewsCount: 56,
+    image: 'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?auto=format&fit=crop&q=80&w=600',
+    tags: ['New Arrival', 'Birthday'],
+    inStock: true
   }
 ];
 
