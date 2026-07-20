@@ -2373,17 +2373,30 @@ function renderAdmin() {
   let productRowsHtml = '';
   state.products.forEach(prod => {
     productRowsHtml += `
-      <tr>
-        <td><img src="${prod.image}" alt="${prod.name}" style="width: 40px; height: 40px; border-radius: var(--radius-sm); object-fit: cover;"></td>
-        <td><strong>${prod.name}</strong></td>
-        <td><span style="font-size: 0.8rem; text-transform: uppercase;">${prod.category.replace('-', ' ')}</span></td>
-        <td>Rs ${prod.price.toFixed(2)}</td>
-        <td><i class="fa-solid fa-star" style="color: var(--highlight);"></i> ${prod.rating}</td>
-        <td>
-          <button class="btn btn-secondary" onclick="editProduct(${prod.id})" style="padding: 4px 8px; font-size: 0.75rem; color: var(--primary);"><i class="fa-solid fa-pen"></i></button>
-          <button class="btn btn-secondary" onclick="deleteProduct(${prod.id})" style="padding: 4px 8px; font-size: 0.75rem; color: var(--accent);"><i class="fa-solid fa-trash"></i></button>
-        </td>
-      </tr>
+      <div class="product-catalog-card">
+        <div class="product-catalog-card-top">
+          <img class="product-catalog-thumb" src="${prod.image}" alt="${prod.name}">
+          <div>
+            <h4>${prod.name}</h4>
+            <span class="product-catalog-category">${prod.category.replace('-', ' ')}</span>
+          </div>
+          <span class="status-badge-live">● Live</span>
+        </div>
+        <div class="product-catalog-card-bottom">
+          <div class="product-catalog-price">
+            <span class="label">Price</span>
+            <span class="value">Rs ${prod.price.toFixed(2)}</span>
+          </div>
+          <div class="product-catalog-rating">
+            <span class="label">Rating</span>
+            <i class="fa-solid fa-star" style="color: var(--highlight);"></i> ${prod.rating}
+          </div>
+          <div class="product-catalog-actions">
+            <button class="btn-icon-edit" onclick="editProduct(${prod.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="btn-icon-remove" onclick="deleteProduct(${prod.id})"><i class="fa-solid fa-trash"></i> Remove</button>
+          </div>
+        </div>
+      </div>
     `;
   });
 
@@ -2562,12 +2575,22 @@ function renderAdmin() {
                   </div>
                   <div class="form-group-row">
                     <div class="form-group">
-                      <label>Price ($) *</label>
-                      <input type="number" id="admin-prod-price" step="0.01" required placeholder="24.99">
+                      <label>Price (Rs) *</label>
+                      <input type="number" id="admin-prod-price" step="0.01" required placeholder="2500">
                     </div>
                     <div class="form-group">
-                      <label>Image URL *</label>
-                      <input type="text" id="admin-prod-image" required placeholder="Unsplash URL or Local path">
+                      <label>Product Photo *</label>
+                      <div class="image-upload-box" id="image-upload-box" onclick="document.getElementById('admin-prod-image-file').click()">
+                        <img id="admin-prod-image-preview" src="" alt="" style="display:none;">
+                        <div id="image-upload-placeholder">
+                          <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--primary); display: block; margin-bottom: 8px;"></i>
+                          <p style="margin: 0; font-weight: 600;">Click to upload a photo</p>
+                          <span style="font-size: 0.75rem; color: var(--text-secondary);">JPG or PNG, max 5MB</span>
+                        </div>
+                      </div>
+                      <input type="file" id="admin-prod-image-file" accept="image/*" style="display:none;" onchange="handleProductImageSelect(event)">
+                      <input type="hidden" id="admin-prod-image">
+                      <div id="image-upload-status" style="font-size: 0.8rem; margin-top: 6px; color: var(--text-secondary);"></div>
                     </div>
                   </div>
                   <div class="form-group">
@@ -2586,22 +2609,8 @@ function renderAdmin() {
               <div class="table-header-bar">
                 <h3>Product Catalog List</h3>
               </div>
-              <div class="admin-table-wrapper">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Img</th>
-                      <th>Name</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th>Rating</th>
-                      <th>Action Commands</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${productRowsHtml}
-                  </tbody>
-                </table>
+              <div class="product-catalog-list">
+                ${productRowsHtml}
               </div>
             </div>
           </div>
@@ -2735,6 +2744,11 @@ window.handleProductSubmit = async function(event) {
   const image = document.getElementById('admin-prod-image').value.trim();
   const description = document.getElementById('admin-prod-desc').value.trim();
 
+  if (!image) {
+    alert('Please upload a product photo before saving.');
+    return;
+  }
+
   const isEditing = !!state.editingProductId;
   let savedProduct;
 
@@ -2795,9 +2809,45 @@ window.editProduct = function(prodId) {
   document.getElementById('admin-prod-price').value = prod.price;
   document.getElementById('admin-prod-image').value = prod.image;
   document.getElementById('admin-prod-desc').value = prod.description;
-  
+
+  // Show the existing photo in the upload box preview
+  const previewImg = document.getElementById('admin-prod-image-preview');
+  const placeholder = document.getElementById('image-upload-placeholder');
+  previewImg.src = prod.image;
+  previewImg.style.display = 'block';
+  placeholder.style.display = 'none';
+
   // Scroll to form
   window.scrollTo({ top: 180, behavior: 'smooth' });
+};
+
+// Handles the Admin selecting a photo file: shows an instant local preview,
+// then uploads it to Firebase Storage and saves the resulting URL.
+window.handleProductImageSelect = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const previewImg = document.getElementById('admin-prod-image-preview');
+  const placeholder = document.getElementById('image-upload-placeholder');
+  const statusEl = document.getElementById('image-upload-status');
+
+  // Instant local preview while uploading
+  previewImg.src = URL.createObjectURL(file);
+  previewImg.style.display = 'block';
+  placeholder.style.display = 'none';
+  statusEl.innerText = '⏳ Uploading photo...';
+  statusEl.style.color = 'var(--text-secondary)';
+
+  try {
+    const url = await uploadProductImageToCloud(file);
+    document.getElementById('admin-prod-image').value = url;
+    statusEl.innerText = '✅ Photo uploaded successfully';
+    statusEl.style.color = 'var(--primary)';
+  } catch (err) {
+    console.error(err);
+    statusEl.innerText = '❌ Upload failed. Check your internet connection and try again.';
+    statusEl.style.color = 'var(--accent)';
+  }
 };
 
 window.cancelProductEdit = function() {

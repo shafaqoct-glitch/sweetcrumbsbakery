@@ -14,6 +14,18 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
+
+// ---- Product Image Upload Helper ----
+
+// Uploads a photo file selected by the Admin directly to Firebase Storage
+// and returns a permanent, public download URL to save on the product.
+async function uploadProductImageToCloud(file) {
+  const fileRef = storage.ref('product-images/' + Date.now() + '_' + file.name);
+  await fileRef.put(file);
+  const url = await fileRef.getDownloadURL();
+  return url;
+}
 
 // ---- Product Cloud Helpers ----
 
